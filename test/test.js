@@ -3,7 +3,7 @@ const should = chai.should();
 const assert = chai.assert;
 const expect = chai.expect;
 import * as sinon from "sinon";
-import Add from "../maths.js";
+import Add, { isAlive } from "../maths.js";
 
 describe("addition-test", function () {
   it("should return 3 when passed 1 and 2", function () {
@@ -32,5 +32,32 @@ describe("Spy test", function () {
     Add(numberOne, numberTwo, logSpy);
     //logSpy.called.should.be.true;
     logSpy.calledWith(3).should.be.true;
+  });
+});
+
+describe("isAlive tests", function () {
+  it("should return true when ping returns true 3 times in a row", function () {
+    const pinger = sinon.stub().returns(true);
+    pinger.onCall(0).returns(true);
+    pinger.onCall(1).returns(true);
+    pinger.onCall(2).returns(true);
+    const websiteIsAlive = isAlive(pinger);
+    websiteIsAlive.should.be.true;
+  });
+  it("should not return true when ping does not return true 3 times in a row", function () {
+    const pinger = sinon.stub().returns(true);
+    pinger.onCall(0).returns(true);
+    pinger.onCall(1).returns(true);
+    pinger.onCall(2).returns(false);
+    const websiteIsAlive = isAlive(pinger);
+    websiteIsAlive.should.be.true;
+  });
+  it("should return and error when ping throws an error", function () {
+    const pinger = sinon.stub().returns(true);
+    pinger.throws(new Error("ping threw an error"));
+    const error = () => {
+      isAlive(pinger);
+    };
+    error.should.throw("ping threw an error");
   });
 });
