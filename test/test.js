@@ -61,3 +61,39 @@ describe("isAlive tests", function () {
     error.should.throw("ping threw an error");
   });
 });
+const API = {
+  isAlive: function () {
+    let pingOneSuccess, pingTwoSuccess, pingThreeSuccess;
+    try {
+      pingOneSuccess = this.Ping();
+      pingTwoSuccess = this.Ping();
+      //pingThreeSuccess = this.Ping();
+    } catch (error) {
+      return new Error("Ping failed");
+    }
+
+    if (pingOneSuccess && pingTwoSuccess && pingThreeSuccess) {
+      return true;
+    }
+    return false;
+  },
+  Ping: function () {
+    return true;
+  },
+  KillServer: function () {},
+};
+describe("mockAPI tests", function () {
+  it("should call Ping 3 times", function () {
+    const mockAPI = sinon.mock(API);
+    mockAPI.expects("Ping").exactly(3);
+    API.isAlive();
+    mockAPI.verify();
+    mockAPI.restore();
+  });
+  it("should not call KIllServer", function () {
+    const mockAPI = sinon.mock(API);
+    mockAPI.expects("KillServer").never();
+    API.isAlive();
+    mockAPI.verify();
+  });
+});
